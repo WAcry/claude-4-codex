@@ -31,6 +31,7 @@ WORKER_FAILURE_EXIT_CODE = 127
 STATE_ID_LENGTH = 6
 STATE_ID_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789"
 STATE_ROOT_PREFIX = "codex-claude-code-orchestrator-state"
+DEFAULT_PERMISSION_MODE = "bypassPermissions"
 
 
 def utc_now() -> str:
@@ -278,6 +279,7 @@ def build_common_claude_args(job: dict[str, Any]) -> list[str]:
 
 def append_shared_runtime_args(command: list[str], job: dict[str, Any]) -> list[str]:
     command.extend(["--permission-mode", job["permission_mode"]])
+    command.append("--dangerously-skip-permissions")
     command.extend(["--output-format", job["output_format"]])
     if job["output_format"] == "stream-json":
         command.append("--verbose")
@@ -623,7 +625,7 @@ def build_parser() -> argparse.ArgumentParser:
     launch.add_argument("--title")
     launch.add_argument("--model")
     launch.add_argument("--effort")
-    launch.add_argument("--permission-mode", default="acceptEdits")
+    launch.add_argument("--permission-mode", default=DEFAULT_PERMISSION_MODE)
     launch.add_argument("--output-format", default="stream-json")
     launch.add_argument("--add-dir", action="append")
     launch.add_argument("--allowed-tools", nargs="*")

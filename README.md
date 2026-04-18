@@ -15,6 +15,10 @@ Codex investigates, reasons, plans, codes. Claude Code executes presentation-lay
 
 Codex retains ownership of investigation, complex reasoning, and accuracy review.
 
+## Execution Model
+
+The orchestrator is intended for fully non-interactive Codex automation. By default it bypasses Claude's own permission prompts so the surrounding VM, container, or Codex sandbox remains the only safety boundary.
+
 ## Commands for the Agent
 
 | Command | Purpose |
