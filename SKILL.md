@@ -7,7 +7,7 @@ description: Delegate subtasks to a local Claude Code instance. Suited for front
 
 ## Delegation Model
 
-GPT and Claude have complementary strengths. GPT has stronger reasoning and investigation capabilities but suffers from the curse of knowledge—its explanations are terse and hard for humans to follow. Claude has weaker reasoning and its code often has bugs, but it excels at aesthetics, UI design, and accessible, human-friendly writing. GPT provides accuracy, Claude provides readability. Therefore GPT **must not rewrite** Claude's output for human—only fix factual errors and bugs.
+GPT and Claude have complementary strengths. GPT reasons much more accurately; Claude is less reliable and less intelligent. However, GPT's training favors precision and brevity—its output lacks design sense and reads as expert notes, not step-by-step pedagogical explanations. Claude's training favors patient, accessible teaching and polished visual design. These are model-level tendencies, not prompting problems—neither can replicate the other's strength by trying harder. GPT provides accuracy, Claude provides readability. Therefore GPT must not rephrase Claude's output.
 
 ### Tasks Suitable for Delegating to Claude Code
 
