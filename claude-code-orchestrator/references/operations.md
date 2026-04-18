@@ -11,7 +11,9 @@ python ./claude-code-orchestrator/scripts/claude_orchestrator.py launch \
 ```
 
 The full prompt is sent to Claude through stdin. The command metadata keeps a short preview, while `prompt.txt` stores the full launch prompt on disk.
-The helper wraps Claude with `bash -lc` so the job runs with login-shell semantics by default.
+The helper uses a platform-aware launcher:
+- Linux and macOS: `bash -lc`
+- Windows: direct `claude` invocation without a Bash wrapper
 Launch creates a random 6-character `state_id` and a matching state directory in the system temp folder. Save the printed `state_id` and reuse it for every follow-up command.
 
 Inspect every job in the registry:
@@ -103,7 +105,7 @@ Do not share one `state_id` across unrelated orchestrators. Assume other Codex i
 ## Recommended Workflow
 
 1. Dry-run first when changing prompt shape, model/effort, or hook behavior.
-2. Launch the real run once the command looks correct. The recorded command should show `bash -lc 'claude ...'` rather than a direct bare executable call.
+2. Launch the real run once the command looks correct. The recorded command should show `bash -lc 'claude ...'` on Linux and macOS, and a direct `claude ...` argv launch on Windows.
 3. Use `status` instead of guessing which session ID belongs to which task, and check `stderr.log` when a run fails or stalls.
 4. Resume the same job instead of creating ad hoc new sessions for follow-up instructions.
 5. Leave Codex review until after Claude Code finishes.
@@ -113,7 +115,7 @@ Do not share one `state_id` across unrelated orchestrators. Assume other Codex i
 
 - Linux: use the Bash examples as written
 - macOS: use the same Bash examples and the same generated temp-backed `state_id` flow
-- Windows: prefer PowerShell path conventions in operator docs and wrappers; if you are not using WSL, validate the local Claude launcher before depending on the current Bash-based helper
+- Windows: prefer PowerShell path conventions in operator docs and wrappers; the current helper does not require Bash and launches `claude` directly
 
 ## Multi-Job Scheduling
 

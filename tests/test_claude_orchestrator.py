@@ -123,6 +123,22 @@ class ClaudeOrchestratorTests(unittest.TestCase):
                 (state_root / "jobs" / "job-ui" / "prompt.txt").read_text(encoding="utf-8"),
             )
 
+    def test_windows_launcher_avoids_bash_wrapper(self):
+        raw = [
+            "claude",
+            "-p",
+            "--session-id",
+            "session-win",
+            "--settings",
+            r"C:\Temp\state\settings.json",
+        ]
+        with mock.patch.object(self.module.os, "name", "nt"):
+            command = self.module.wrap_for_platform_launcher(raw)
+            command_text = self.module.format_command(command)
+        self.assertEqual(raw, command)
+        self.assertIn("claude", command_text)
+        self.assertNotIn("bash -lc", command_text)
+
     def test_launch_without_state_id_allocates_short_id_in_system_temp(self):
         with tempfile.TemporaryDirectory() as tempdir:
             workdir = Path(tempdir) / "repo"

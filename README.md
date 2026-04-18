@@ -4,7 +4,10 @@ This repository contains an installable Codex skill named `claude-code-orchestra
 
 The skill helps Codex delegate focused work to one or more local Claude Code CLI runs while keeping Codex as the primary responsible agent. It is designed for cases where Claude Code is a good execution partner, such as frontend polish, demo building, and documentation drafting, but the final review and acceptance should still stay with Codex.
 
-The helper currently defaults to launching Claude through `bash -lc`, so the delegated run inherits the same login-shell configuration and wrapper behavior that users normally rely on in a terminal session.
+The helper uses a platform-aware launcher:
+
+- Linux and macOS: `bash -lc`
+- Windows: direct `claude` invocation without a Bash wrapper
 
 ## What Is Included
 
@@ -49,7 +52,7 @@ python ./claude-code-orchestrator/scripts/claude_orchestrator.py launch \
 ```
 
 The orchestrator stores the full prompt in `prompt.txt` and feeds it to Claude over stdin, so long handoff prompts do not need to appear in the shell command or process list.
-The generated command uses `bash -lc 'claude ...'` by default rather than calling `claude` directly.
+The generated command uses `bash -lc 'claude ...'` on Linux and macOS, and a direct `claude ...` argv launch on Windows.
 Launch now allocates a random 6-character `state_id` and a matching state directory under the system temp folder. Save that printed `state_id` for every follow-up command.
 
 Inspect tracked jobs:
@@ -112,8 +115,8 @@ Assume other Codex instances may exist and isolate state by default. Give each C
 ## Platform Guidance
 
 - Linux: first-class target for the current helper and examples
-- macOS: use the same Bash examples and the same temp-backed state-root pattern
-- Windows: prefer PowerShell conventions for temp paths and operator docs. If you need native Windows execution, validate the local Claude launcher path carefully because the current helper still wraps Claude with `bash -lc`
+- macOS: uses the same `bash -lc` launcher strategy as Linux
+- Windows: prefer PowerShell conventions for temp paths and operator docs; the current helper does not require Bash and launches `claude` directly
 
 PowerShell temp-root example:
 

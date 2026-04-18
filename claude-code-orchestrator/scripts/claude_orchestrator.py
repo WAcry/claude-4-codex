@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-DEFAULT_STATE_ROOT = ".claude-orchestrator-state"
 JOBS_DIRNAME = "jobs"
 REGISTRY_FILENAME = "registry.json"
 JOB_FILENAME = "job.json"
@@ -111,7 +110,16 @@ def shell_join(parts: Iterable[str]) -> str:
     return shlex.join(list(parts))
 
 
-def wrap_with_login_shell(command: list[str]) -> list[str]:
+def format_command(parts: Iterable[str]) -> str:
+    materialized = list(parts)
+    if os.name == "nt":
+        return subprocess.list2cmdline(materialized)
+    return shlex.join(materialized)
+
+
+def wrap_for_platform_launcher(command: list[str]) -> list[str]:
+    if os.name == "nt":
+        return list(command)
     return ["bash", "-lc", shell_join(command)]
 
 
@@ -290,7 +298,7 @@ def append_attempt(
         "status": "dry_run" if dry_run else "queued",
         "dry_run": dry_run,
         "command": command,
-        "command_text": shell_join(command),
+        "command_text": format_command(command),
         "prompt_preview": prompt_preview(prompt or ""),
         "prompt_path": str(Path(job["job_dir"]) / PROMPT_FILENAME) if kind == "launch" and prompt else None,
         "stdin_path": str(stdin_path) if stdin_path else None,
@@ -381,7 +389,7 @@ def cmd_launch(args: argparse.Namespace) -> int:
         "exit_code": None,
         "attempts": [],
     }
-    command = wrap_with_login_shell(build_common_claude_args(job))
+    command = wrap_for_platform_launcher(build_common_claude_args(job))
     append_attempt(job, kind="launch", prompt=prompt, command=command, dry_run=args.dry_run)
     write_job_artifacts(job, prompt)
     save_job(state_root, job)
@@ -511,7 +519,7 @@ def cmd_resume(args: argparse.Namespace) -> int:
     job["model"] = override_model
     job["effort"] = override_effort
     job["use_bare"] = override_bare
-    command = wrap_with_login_shell(
+    command = wrap_for_platform_launcher(
         append_shared_runtime_args(["claude", "-p", "--resume", job["session_id"]], job)
     )
     append_attempt(job, kind="resume", prompt=args.message, command=command, dry_run=args.dry_run)
