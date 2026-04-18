@@ -1,5 +1,5 @@
 ---
-name: claude-code-orchestrator
+name: claude-for-codex
 description: Delegate subtasks to a local Claude Code instance. Suited for front-end UI implementation, documentation writing, rewriting investigation conclusions into human-readable formats, demo prototypes, and other tasks requiring aesthetics or human readability. Triggered when coordinating Claude Code to complete limited-scope work. This skill is for use only by agents powered by OpenAI GPT models.
 ---
 
